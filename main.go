@@ -20,20 +20,51 @@ type Todo struct {
 	done bool
 }
 
-var todoList TodoList
+var todoList = TodoList{}
 
 func addTodo(id int, text string, is_done bool) bool {
-	_ = append(todoList.Todo, Todo{
-		id:   len(todoList.Todo) + 1,
+	todoList.Todo = append(todoList.Todo, Todo{
+		id:   id,
 		text: text,
 		done: is_done,
 	})
+	return true
+}
 
+func listTodo() {
+	for _, todo := range todoList.Todo {
+		fmt.Printf("%d : %s is done %t\n", todo.id, todo.text, todo.done)
+	}
+}
+
+func updateStatus(id int, status bool) bool {
+	if id > len(todoList.Todo) || id < 0 {
+		return false
+	}
+	todoList.Todo[id].done = status
+	fmt.Printf("Updated status for %d from %t to %t", id, !status, status)
+	return true
+}
+
+func removeSliceItem(index int) []Todo {
+	return append(todoList.Todo[:index], todoList.Todo[index+1:]...)
+}
+
+func deleteTodo(id int) bool {
+	if id > len(todoList.Todo) || id < 0 {
+		return false
+	}
+	for index, task := range todoList.Todo {
+		if task.id == id {
+			todoList.Todo = removeSliceItem(index)
+			break
+		}
+	}
+	fmt.Println("Deleted successfully")
 	return true
 }
 
 func main() {
-	fmt.Println("TODO: implement todo.go")
 
 	tasks := TodoList{
 		Todo: []Todo{
@@ -58,6 +89,9 @@ func main() {
 	for _, task := range tasks.Todo {
 		addTodo(task.id, task.text, task.done)
 	}
-	fmt.Print("Successfully added todo")
-	fmt.Print(todoList)
+	fmt.Println("Added task in todo list")
+	listTodo()
+	updateStatus(2, true)
+	deleteTodo(1)
+	listTodo()
 }
